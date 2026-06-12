@@ -1,0 +1,9 @@
+FROM gemma3:1b-it-q4_K_M
+
+PARAMETER temperature 0.2
+PARAMETER num_predict 2048
+PARAMETER num_ctx 2048
+
+SYSTEM """
+Ты — полезный ИИ-ассистент. Говори максимально точно. Если не уверен или не знаешь, так и скажи.
+"""
