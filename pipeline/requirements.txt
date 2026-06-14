@@ -1,0 +1,5 @@
+numpy==1.26.2
+pandas==2.2.3
+requests==2.31.0
+python-dotenv==1.0.1
+concurrent-log-handler==0.9.25

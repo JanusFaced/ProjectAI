@@ -1,0 +1,54 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    networks:
+      - app-network
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama-data:/root/.ollama
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    restart: unless-stopped
+
+#  open-webui:
+#    image: ghcr.io/open-webui/open-webui:main
+#    container_name: open-webui
+#    networks:
+#      - app-network
+#    ports:
+#      - "3000:8080"
+#    volumes:
+#      - ./openwebui-data:/app/backend/data
+#    environment:
+#      - OLLAMA_BASE_URL=http://ollama:11434
+#      - WEBUI_AUTH=true
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#    depends_on:
+#      - ollama
+#    restart: unless-stopped
+
+  pipeline:
+    image: ai_pipeline
+    build: ./pipeline
+    command: sh -c "cd src && python main.py"
+    networks:
+      - app-network
+    volumes:
+      - ./pipeline/src/output:/app/src/output
+      - ./pipeline/src/logs:/app/src/logs
+    depends_on:
+      - ollama
+
+volumes:
+  ollama-data:
+    driver: local
+  openwebui-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
