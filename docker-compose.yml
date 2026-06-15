@@ -2,6 +2,9 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/kfd:/dev/kfd
     networks:
       - app-network
     ports:
