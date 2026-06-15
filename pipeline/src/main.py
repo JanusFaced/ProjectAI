@@ -9,22 +9,9 @@ current_dir = current_file_path.parent
 
 logger = get_logger(__name__)
 
-OLLAMA_HOST = "http://ollama:11434" 
+OLLAMA_HOST = "http://ollama:11434"
 
-def ask_ollama(prompt: str, model: str ="llama3.2") -> str:
-	payload = {
-		"model": model,
-		"prompt": prompt,
-		"stream": False  # Ставим False, чтобы получить сразу полный ответ
-	}
-	try:
-		response = requests.post(f"{OLLAMA_HOST}/api/generate", json=payload)
-		response.raise_for_status()
-		return response.json()["response"]
-	except Exception as e:
-		return f"Ошибка: {e}"
-
-def main() -> None:
+def ai_model(prompt: str) -> str:
 
 	list_of_models: Dict = {
 		"S": "gemma3:1b-it-q4_K_M",
@@ -34,11 +21,40 @@ def main() -> None:
 
 	}
 
+	system = "Ты — креативный разработчик с богатым воображением."
+
+	payload={
+		"model": list_of_models["S"],
+		"prompt": prompt,
+		"system": system,
+		"stream": False,
+		"keep_alive": "5m",
+		"options": {
+			"num_ctx": 4096,
+			"num_predict": 4096,
+			"temperature": 0.9,
+			"top_p": 0.95,
+			"top_k": 60,
+			"repeat_penalty": 1.15,
+			"repeat_last_n": 64
+		}
+	}
+
+	try:
+		response = requests.post(f"{OLLAMA_HOST}/api/generate", json=payload)
+		response.raise_for_status()
+		return response.json()["response"]
+	
+	except Exception as e:
+		return f"Ошибка: {e}"
+
+def main() -> None:
+
 	messege: str = """
-	Напиши "Привет" на нескольких языках мира.
+	Дай несколько бизнес идей с ИИ.
 	"""
 
-	answer: str = ask_ollama(prompt=messege, model=list_of_models["S"])
+	answer: str = ai_model(prompt=messege)
 	logger.info(answer)
 
 main()
